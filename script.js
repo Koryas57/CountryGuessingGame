@@ -1177,6 +1177,33 @@ svg.addEventListener('pointerup', () => {
     isPanning = false;
 });
 
+let lastTouchDistance = null;
+
+svg.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+        e.preventDefault();
+
+        const [touch1, touch2] = e.touches;
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (lastTouchDistance) {
+            const delta = (distance - lastTouchDistance) * 0.01;
+            scale += delta;
+            scale = Math.min(Math.max(0.5, scale), 5);
+            svg.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
+        }
+
+        lastTouchDistance = distance;
+    }
+}, { passive: false });
+
+svg.addEventListener('touchend', () => {
+    lastTouchDistance = null;
+});
+
+
 svg.addEventListener('wheel', (e) => {
     e.preventDefault();
 
