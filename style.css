@@ -1,0 +1,215 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(to bottom, #1a1a1a, #333);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+h1 {
+  background-color: #fff;
+  width: fit-content;
+  padding: 1rem;
+  color: #333;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 2rem;
+  margin: 1rem auto;
+  font-size: 2rem;
+  text-align: center;
+}
+
+p {
+  padding: 1rem;
+  color: #ffffff;
+  margin: 1rem auto;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+#svgContainer {
+  width: 85vw;
+  height: 85vh;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #444;
+  touch-action: none;
+  background-color: #222;
+  touch-action: none;
+}
+
+#svgContainer svg {
+  touch-action: none;
+  transition: transform 0.05s ease-out;
+}
+
+#map-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+#svgMap {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ccc;
+}
+
+#modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+#modal.show {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  position: relative;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.modal-content p {
+  color: #333;
+  font-weight: 500;
+}
+
+.close-btn {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+input {
+  width: 75%;
+  border: 2px solid gray;
+  border-radius: 2rem;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+#gameInfo {
+  background: #111;
+  color: white;
+  padding: 20px;
+  margin: 2rem 1rem;
+  border-radius: 2rem;
+  font-size: 18px;
+  text-align: center;
+  border-top: 3px solid #333;
+  font-family: "Segoe UI", sans-serif;
+}
+
+#regionProgress {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.regionBox {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  color: #fff;
+  min-width: 180px;
+}
+
+#feedback {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  #map-container {
+    height: 70vh;
+  }
+
+  .modal-content {
+    width: 95%;
+  }
+
+  #svgMap {
+    touch-action: pan-x pan-y;
+  }
+}
+
+#starburst-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+.star {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: gold;
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+  opacity: 0.9;
+  animation: burst 0.8s ease-out forwards;
+}
+
+@keyframes burst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0.5);
+    opacity: 0;
+  }
+}
