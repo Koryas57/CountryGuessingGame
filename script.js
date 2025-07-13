@@ -570,7 +570,7 @@ const countryInfo = {
         "color": "#9013fe"
     },
     "KP": {
-        "name": "dem. rep. korea",
+        "name": "coree du nord",
         "region": "asie de l est",
         "color": "#d0021b"
     },
@@ -780,7 +780,7 @@ const countryInfo = {
         "color": "#ff7e00"
     },
     "NZ": {
-        "name": "nouvelle-zelande",
+        "name": "nouvelle zelande",
         "region": "oceanie",
         "color": "#00c8ff"
     },
@@ -1026,29 +1026,6 @@ const successSound = new Audio('success.mp3');
 
 // --- Initialisation au chargement de la page ---
 window.addEventListener('load', () => {
-    const countries = document.querySelectorAll('#svgContainer svg [id]');
-
-    countries.forEach(country => {
-        country.style.fill = '#eee';
-        country.style.stroke = '#333';
-        country.style.strokeWidth = '0.5';
-
-        country.addEventListener('click', () => {
-            selectedCountry = country;
-
-            const info = countryInfo[selectedCountry.id?.toUpperCase()];
-            if (info && info.color) {
-                selectedCountry.setAttribute('data-original-fill', selectedCountry.style.fill);
-                selectedCountry.style.fill = info.color;
-                selectedCountry.classList.add('pending');
-            } else {
-                selectedCountry.style.fill = 'yellow'; // fallback
-            }
-
-            showModal();
-        });
-    });
-
     // Initialisation des compteurs régionaux
     Object.values(countryInfo).forEach(info => {
         const region = info.region;
@@ -1059,10 +1036,64 @@ window.addEventListener('load', () => {
         regionCounts[region]++;
     });
 
+    // Chargement de la sauvegarde
+    const saved = localStorage.getItem('worldMapGameSave');
+    if (saved) {
+        const { score: savedScore, foundCountries: savedCountries } = JSON.parse(saved);
+        score = savedScore || 0;
+        savedCountries.forEach(name => {
+            const entry = Object.entries(countryInfo).find(([_, val]) => val.name === name);
+            if (entry) {
+                const [id, val] = entry;
+                const country = document.getElementById(id);
+                if (country) {
+                    country.style.fill = val.color;
+                    foundCountries.add(name);
+                    regionFound[val.region]++;
+                }
+            }
+        });
+    }
+
+    // Gestion du clic sur chaque pays
+    const countries = document.querySelectorAll('#svgContainer svg [id]');
+    countries.forEach(country => {
+        const info = countryInfo[country.id?.toUpperCase()];
+        const alreadyFound = info && foundCountries.has(info.name);
+        if (!alreadyFound) {
+            country.style.fill = '#eee';
+        }
+        country.style.stroke = '#333';
+        country.style.strokeWidth = '0.5';
+
+        country.addEventListener('click', () => {
+            selectedCountry = country;
+            const info = countryInfo[selectedCountry.id?.toUpperCase()];
+            if (info && info.color) {
+                selectedCountry.setAttribute('data-original-fill', selectedCountry.style.fill);
+                selectedCountry.style.fill = info.color;
+                selectedCountry.classList.add('pending');
+            } else {
+                selectedCountry.style.fill = 'yellow';
+            }
+            showModal();
+        });
+    });
+
     updateGameInfo();
 });
 
-// --- Affichage de la modal ---
+// --- Sauvegarde ---
+function saveProgress() {
+    const saveData = {
+        score,
+        foundCountries: Array.from(foundCountries),
+        regionFound
+    };
+    localStorage.setItem('worldMapGameSave', JSON.stringify(saveData));
+}
+
+// --- Modal ---
 function showModal() {
     document.getElementById('countryInput').value = '';
     document.getElementById('feedback').innerHTML = '';
@@ -1070,7 +1101,6 @@ function showModal() {
     document.getElementById('countryInput').focus();
 }
 
-// --- Masquage de la modal ---
 function hideModal() {
     document.getElementById('modal').classList.remove('show');
     if (selectedCountry?.classList.contains('pending')) {
@@ -1080,13 +1110,11 @@ function hideModal() {
     selectedCountry = null;
 }
 
-// --- Fermeture modal (croix + clic extérieur) ---
 document.getElementById('closeModal').addEventListener('click', hideModal);
 document.getElementById('modal').addEventListener('click', (e) => {
     if (e.target.id === 'modal') hideModal();
 });
 
-// --- Entrée clavier ---
 document.getElementById('countryInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         document.getElementById('validateBtn').click();
@@ -1107,6 +1135,7 @@ document.getElementById('validateBtn').addEventListener('click', () => {
             score++;
             regionFound[info.region]++;
             updateGameInfo();
+            saveProgress();
         }
 
         selectedCountry.classList.remove('pending');
@@ -1116,6 +1145,7 @@ document.getElementById('validateBtn').addEventListener('click', () => {
         successSound.play();
         triggerStarburst();
         hideModal();
+
     } else {
         document.getElementById('feedback').innerHTML = `
           <span style="color: crimson; font-weight: bold;">❌ Mauvaise réponse. Réessayez.</span>
@@ -1123,34 +1153,24 @@ document.getElementById('validateBtn').addEventListener('click', () => {
     }
 });
 
-// Animation bonne réponse 
-
+// --- Effet étoile ---
 function triggerStarburst() {
     const container = document.getElementById('starburst-container');
-
     for (let i = 0; i < 12; i++) {
         const star = document.createElement('div');
         star.className = 'star';
-
         const angle = (Math.PI * 2 * i) / 12;
         const distance = 80 + Math.random() * 40;
-
         const x = Math.cos(angle) * distance;
         const y = Math.sin(angle) * distance;
-
         star.style.setProperty('--x', `${x}px`);
         star.style.setProperty('--y', `${y}px`);
-
         container.appendChild(star);
-
-        setTimeout(() => {
-            container.removeChild(star);
-        }, 800);
+        setTimeout(() => container.removeChild(star), 800);
     }
 }
 
-
-// --- Zoom & déplacement (pan) ---
+// --- Zoom & déplacement ---
 let isPanning = false;
 let startX = 0, startY = 0;
 let currentX = -500, currentY = -200;
@@ -1173,68 +1193,49 @@ svg.addEventListener('pointermove', (e) => {
     svg.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
 });
 
-svg.addEventListener('pointerup', () => {
-    isPanning = false;
-});
+svg.addEventListener('pointerup', () => isPanning = false);
 
 let lastTouchDistance = null;
 
 svg.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
         e.preventDefault();
-
-        const [touch1, touch2] = e.touches;
-        const dx = touch2.clientX - touch1.clientX;
-        const dy = touch2.clientY - touch1.clientY;
+        const [t1, t2] = e.touches;
+        const dx = t2.clientX - t1.clientX;
+        const dy = t2.clientY - t1.clientY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-
         if (lastTouchDistance) {
             const delta = (distance - lastTouchDistance) * 0.01;
-            scale += delta;
-            scale = Math.min(Math.max(0.5, scale), 5);
+            scale = Math.min(Math.max(0.5, scale + delta), 5);
             svg.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
         }
-
         lastTouchDistance = distance;
     }
 }, { passive: false });
 
-svg.addEventListener('touchend', () => {
-    lastTouchDistance = null;
-});
-
+svg.addEventListener('touchend', () => lastTouchDistance = null);
 
 svg.addEventListener('wheel', (e) => {
     e.preventDefault();
-
     const rect = svg.getBoundingClientRect();
     const offsetX = e.clientX - rect.left;
     const offsetY = e.clientY - rect.top;
-
     const prevScale = scale;
     const delta = e.deltaY * -0.005;
-    scale += delta;
-    scale = Math.min(Math.max(0.5, scale), 5);
-
-    // Ajuste le pan pour zoomer vers le curseur
+    scale = Math.min(Math.max(0.5, scale + delta), 5);
     currentX -= (offsetX / prevScale - offsetX / scale);
     currentY -= (offsetY / prevScale - offsetY / scale);
-
     svg.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
 });
 
-
-// --- Mise à jour de l'interface de jeu ---
+// --- UI Score & Régions ---
 function updateGameInfo() {
     document.getElementById('scoreDisplay').innerText = `${score} pays découverts !`;
-
     const regionContainer = document.getElementById('regionProgress');
     regionContainer.innerHTML = '';
-
     Object.entries(regionCounts).forEach(([region, total]) => {
         const found = regionFound[region] || 0;
         const color = Object.values(countryInfo).find(info => info.region === region)?.color || '#666';
-
         const div = document.createElement('div');
         div.className = 'regionBox';
         div.style.backgroundColor = color;
@@ -1242,3 +1243,12 @@ function updateGameInfo() {
         regionContainer.appendChild(div);
     });
 }
+
+// --- Réinitialisation du jeu ---
+document.getElementById('resetGameBtn').addEventListener('click', () => {
+    if (!confirm("Voulez-vous vraiment recommencer la partie ?")) return;
+
+    localStorage.removeItem('worldMapGameSave');
+    location.reload();
+});
+

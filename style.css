@@ -131,6 +131,16 @@ button:hover {
   font-family: "Segoe UI", sans-serif;
 }
 
+#resetGameBtn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin: 2.5rem auto;
+}
+
 #regionProgress {
   display: flex;
   flex-wrap: wrap;
