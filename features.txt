@@ -1,0 +1,7 @@
+Fonctionnalités à rajouter : 
+
+- Si on reselectionne le pays, afficher le nom et le drapeau du pays ainsi que la population dans une modale au lieu de la question
+
+- Idées d'indices, systeme du pendu ou de cases pour l'input pour deviner le nombre de lettres. Consommer un indice ( 3 possibles ), révelation de lettres, drapeau, langue parlée
+
+- Systèmes de points, gagner un truc quand une collection de région est terminée.

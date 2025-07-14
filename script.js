@@ -285,7 +285,7 @@ const countryInfo = {
         "color": "#417505"
     },
     "GY": {
-        "name": "guyana",
+        "name": "guyane",
         "region": "amerique du sud",
         "color": "#f8e71c"
     },
@@ -560,7 +560,7 @@ const countryInfo = {
         "color": "#e67e22"
     },
     "PG": {
-        "name": "papouasie-nouvelle-guinee",
+        "name": "papouasie nouvelle guinee",
         "region": "oceanie",
         "color": "#00c8ff"
     },
@@ -695,7 +695,7 @@ const countryInfo = {
         "color": "#9e9e9e"
     },
     "TL": {
-        "name": "timor-leste",
+        "name": "timor leste",
         "region": "asie du sud est",
         "color": "#e67e22"
     },
@@ -820,7 +820,7 @@ const countryInfo = {
         "color": "#7ed321"
     },
     "GF": {
-        "name": "guyane",
+        "name": "guyane francaise",
         "region": "amerique du sud",
         "color": "#f8e71c"
     },
@@ -1221,7 +1221,7 @@ svg.addEventListener('wheel', (e) => {
     const offsetX = e.clientX - rect.left;
     const offsetY = e.clientY - rect.top;
     const prevScale = scale;
-    const delta = e.deltaY * -0.005;
+    const delta = e.deltaY * -0.002;
     scale = Math.min(Math.max(0.5, scale + delta), 5);
     currentX -= (offsetX / prevScale - offsetX / scale);
     currentY -= (offsetY / prevScale - offsetY / scale);
